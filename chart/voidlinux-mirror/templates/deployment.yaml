@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.chart.fullname }}
+  labels:
+    app: mirror
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: mirror
+  template:
+    metadata:
+      labels:
+        app: mirror
+    spec:
+      containers:
+        - name: nginx
+          image: "nginx:{{ .Values.nginx.tag }}"
+          ports:
+            - containerPort: {{ .Values.nginx.conf.port }}
+          volumeMounts:
+            - name: mirror-volume
+              mountPath: /var/www/mirror
+      Volumes:
+        - name: mirror-volume
+          hostPath:
+            path: {{ .Values.volume.hostPath }}
+            type: DirectoryOrCreate

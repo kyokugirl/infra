@@ -1,0 +1,34 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ .Values.chart.fullname }}-cronjob
+  labels:
+    app: mirror
+spec:
+  schedule: {{ .Values.cronjob.schedule }}
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: mirror
+        spec:
+          containers:
+            - name: rsync
+              image: "eeacms/rsync:{{ .Values.rsync.tag }}"
+              command: ["rsync"]
+              args:
+                - "-avz" # Archive, verbose, compress
+                - "--delete" # Delete files not in source
+                - "{{ .Values.rsync.source }}"
+                - "/var/www/mirror"
+              volumeMounts:
+                - name: mirror-volume
+                  mountPath: /var/www/mirror
+          volumes:
+            - name: mirror-volume
+              hostPath:
+                type: DirectoryOrCreate
+                path: {{ .Values.volume.hostPath }}
+
+          restartPolicy: OnFailure

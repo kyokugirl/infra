@@ -1,0 +1,19 @@
+chart:
+  fullname: voidlinux-mirror
+  replicaCount: 1
+
+nginx:
+  tag: nginx:stable-alpine
+  conf:
+    port: 80
+    serverName: mirror.kyoku.dev
+
+rsync:
+  tag: "2.6"
+  source: rsync://repo-sync.voidlinux.org/voidlinux/
+
+cronjob:
+  schedule: "0 */2 * * *" # Every 2 hours
+
+volume:
+  hostPath: /var/www/mirror
